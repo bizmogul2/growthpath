@@ -32,6 +32,9 @@ function fmtN(n) {
   return "₦" + num.toLocaleString("en-NG");
 }
 
+// Put your WhatsApp business number here in international format,
+// digits only, no +, no spaces, no leading 0 — e.g. Nigeria 080... becomes
+// "234" + the number without the leading 0: "2348012345678"
 const WHATSAPP_NUMBER = "2348037193840";
 
 function whatsappLink(name) {
@@ -53,7 +56,7 @@ const MODULES = [
       "Build 2–3 sample projects for a portfolio before you pitch anyone.",
       "List your services on a freelance platform and price on the lower end while you build reviews, then raise your rate.",
     ],
-    affiliate: { label: "Recommended AI toolkit", desc: "A starter bundle of AI tools for freelancers.", url: "" },
+    affiliate: { label: "Recommended AI toolkit", desc: "A starter bundle of AI tools for freelancers.", url: "https://tinyurl.com/m98fjz79" },
   },
   {
     id: "dropship",
@@ -66,7 +69,7 @@ const MODULES = [
       "Test with a small ad budget before committing more money.",
       "Margins are thinner than they look once you count ads and returns — treat it as a real business, not a shortcut.",
     ],
-    affiliate: { label: "Recommended store platform", desc: "Set up a storefront in under an hour.", url: "" },
+    affiliate: { label: "Recommended store platform", desc: "Set up a storefront in under an hour.", url: "https://aff.stakecut.com/157058/464829" },
   },
   {
     id: "content",
@@ -79,7 +82,7 @@ const MODULES = [
       "Expect the first 6–12 months to be about skill-building, not income.",
       "Once you have an audience, income comes from brand deals, ads, and your own products.",
     ],
-    affiliate: { label: "Recommended editing tool", desc: "Cut and edit content faster from your phone.", url: "" },
+    affiliate: { label: "Recommended editing tool", desc: "Cut and edit content faster from your phone.", url: "https://aff.stakecut.com/123438/464829" },
   },
   {
     id: "trading",
@@ -92,7 +95,7 @@ const MODULES = [
       "Spreading money across different assets lowers the damage from any single one falling.",
       "Be skeptical of anything promising guaranteed high returns — that's a red flag, not an opportunity.",
     ],
-    affiliate: { label: "Recommended learning platform", desc: "Investing basics before you put money in.", url: "" },
+    affiliate: { label: "Recommended learning platform", desc: "Investing basics before you put money in.", url: "https://aff.stakecut.com/543223/464829" },
     note: "This is general education, not personal financial advice. Consider speaking with a licensed financial advisor before investing.",
   },
   {
@@ -106,7 +109,7 @@ const MODULES = [
       "Price based on your time, materials, and a fair margin — don't undercharge to compete.",
       "Low starting cost and word-of-mouth growth make this one of the fastest ways to get your first paying customer.",
     ],
-    affiliate: { label: "Recommended certification course", desc: "Get certified in an in-demand local trade.", url: "" },
+    affiliate: { label: "Recommended certification course", desc: "Get certified in an in-demand local trade.", url: "https://aff.stakecut.com/393985/464829" },
   },
   {
     id: "affiliate",
@@ -119,7 +122,7 @@ const MODULES = [
       "Always disclose that your links are affiliate links — it's the law in many places, and it builds trust.",
       "Commissions per sale are usually small, so this works on volume and genuine trust, not one big win.",
     ],
-    affiliate: { label: "Recommended affiliate network", desc: "Find products relevant to your audience.", url: "" },
+    affiliate: { label: "Recommended affiliate network", desc: "Find products relevant to your audience.", url: "https://aff.stakecut.com/503/464829" },
   },
 ];
 
@@ -150,6 +153,9 @@ const STEPS = [
   { id: "ready", key: "ready", input: "buttons", options: ["Yes, show me", "Not right now"], bot: () => "Would you be open to exploring a legitimate way to earn extra income alongside what you already do?" },
 ];
 
+// A stable per-device id, used only to let someone resume their own
+// in-progress chat on this device. It is stored with each saved lead
+// so you can tell repeat visitors apart in the database if you want to.
 function getDeviceId() {
   let id = localStorage.getItem("growpath-device-id");
   if (!id) {
@@ -181,7 +187,9 @@ export default function App() {
           setPhase(parsed.phase);
           return;
         }
-      } catch (e) {}
+      } catch (e) {
+        // ignore corrupted local data
+      }
     }
     setPhase("chat");
   }, []);
@@ -196,18 +204,21 @@ export default function App() {
       setTyping(false);
     }, 450);
     return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, stepIndex]);
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages, typing]);
 
+  // Save the finished profile as a lead in Supabase, and remember locally
+  // so this device lands back on the right screen next visit.
   useEffect(() => {
     if (phase === "modules" || phase === "declined") {
       localStorage.setItem("growpath-progress", JSON.stringify({ answers, phase }));
       saveLead(answers, phase);
     }
-  }, [phase]);
+  }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function saveLead(a, finalPhase) {
     setSaveError("");
@@ -334,9 +345,8 @@ export default function App() {
             Actually, show me now
           </button>
           {WHATSAPP_NUMBER && (
-            
-              <a
-                href={whatsappLink(answers.name)}
+            <a
+              href={whatsappLink(answers.name)}
               target="_blank"
               rel="noopener noreferrer"
               style={{ ...waBtn, marginTop: "0.5rem" }}
@@ -354,9 +364,8 @@ export default function App() {
             <div style={{ color: C.muted, fontSize: "0.85rem", marginTop: "0.2rem" }}>Based on your goal: {answers.goal || "growing your income"}</div>
           </div>
           {WHATSAPP_NUMBER && (
-            
-              <a
-                href={whatsappLink(answers.name)}
+            <a
+              href={whatsappLink(answers.name)}
               target="_blank"
               rel="noopener noreferrer"
               style={{ ...waBtn, marginBottom: "1rem" }}
