@@ -115,6 +115,9 @@ const MODULES = [
 
 const STEPS = [
   { id: "welcome", input: "continue", bot: () => "Hey — I'm here to help you get a clearer picture of your money, and show you a few legit ways to grow it. Takes about 2 minutes. Ready?" },
+  { id: "name", key: "name", input: "text", placeholder: "Your name", bot: () => "What should I call you?" },
+  { id: "phone", key: "phone", input: "text", placeholder: "WhatsApp number", bot: (a) => `Nice to meet you, ${a.name || "there"}! What's your WhatsApp number?` },
+  { id: "email", key: "email", input: "text", placeholder: "Email address", bot: () => "And your email?" },
   { id: "age", key: "age", input: "number", placeholder: "Age", bot: () => "First, how old are you?" },
   { id: "marital", key: "marital", input: "buttons", options: ["Single", "Married", "Divorced / Widowed"], bot: () => "What's your marital status?" },
   { id: "familySize", key: "familySize", input: "number", placeholder: "Number of people", bot: () => "How many people, including you, depend on your income?" },
@@ -137,9 +140,6 @@ const STEPS = [
   { id: "ready", key: "ready", input: "buttons", options: ["Yes, show me", "Not right now"], bot: () => "Would you be open to exploring a legitimate way to earn extra income alongside what you already do?" },
 ];
 
-// A stable per-device id, used only to let someone resume their own
-// in-progress chat on this device. It is stored with each saved lead
-// so you can tell repeat visitors apart in the database if you want to.
 function getDeviceId() {
   let id = localStorage.getItem("growpath-device-id");
   if (!id) {
@@ -171,9 +171,7 @@ export default function App() {
           setPhase(parsed.phase);
           return;
         }
-      } catch (e) {
-        // ignore corrupted local data
-      }
+      } catch (e) {}
     }
     setPhase("chat");
   }, []);
@@ -188,21 +186,18 @@ export default function App() {
       setTyping(false);
     }, 450);
     return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, stepIndex]);
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [messages, typing]);
 
-  // Save the finished profile as a lead in Supabase, and remember locally
-  // so this device lands back on the right screen next visit.
   useEffect(() => {
     if (phase === "modules" || phase === "declined") {
       localStorage.setItem("growpath-progress", JSON.stringify({ answers, phase }));
       saveLead(answers, phase);
     }
-  }, [phase]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [phase]);
 
   async function saveLead(a, finalPhase) {
     setSaveError("");
@@ -215,6 +210,9 @@ export default function App() {
       monthly_expenses: a.expenses ? Number(a.expenses) : null,
       goal: a.goal || null,
       opted_in: finalPhase === "modules",
+      name: a.name || null,
+      phone: a.phone || null,
+      email: a.email || null,
     });
     if (error) {
       console.error(error);
