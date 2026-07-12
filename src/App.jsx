@@ -335,7 +335,8 @@ export default function App() {
           </button>
           {WHATSAPP_NUMBER && (
             
-              href={whatsappLink(answers.name)}
+              <a
+                href={whatsappLink(answers.name)}
               target="_blank"
               rel="noopener noreferrer"
               style={{ ...waBtn, marginTop: "0.5rem" }}
