@@ -11,6 +11,7 @@ import {
   RotateCcw,
   ExternalLink,
   CheckCircle2,
+  MessageCircle,
 } from "lucide-react";
 import { supabase } from "./supabaseClient";
 
@@ -29,6 +30,15 @@ const C = {
 function fmtN(n) {
   const num = Number(n) || 0;
   return "₦" + num.toLocaleString("en-NG");
+}
+
+const WHATSAPP_NUMBER = "2348037193840";
+
+function whatsappLink(name) {
+  const greeting = name
+    ? `Hi, I'm ${name}. I just went through GrowPath and I'd like to talk more about growing my income.`
+    : "Hi, I just went through GrowPath and I'd like to talk more about growing my income.";
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(greeting)}`;
 }
 
 const MODULES = [
@@ -323,6 +333,16 @@ export default function App() {
           <button onClick={() => setPhase("modules")} style={{ ...ghostBtn, marginTop: "0.5rem" }}>
             Actually, show me now
           </button>
+          {WHATSAPP_NUMBER && (
+            
+              href={whatsappLink(answers.name)}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ ...waBtn, marginTop: "0.5rem" }}
+            >
+              <MessageCircle size={15} /> Chat with us on WhatsApp
+            </a>
+          )}
         </div>
       )}
 
@@ -332,6 +352,16 @@ export default function App() {
             <div style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: "1.15rem" }}>Pick a path to explore</div>
             <div style={{ color: C.muted, fontSize: "0.85rem", marginTop: "0.2rem" }}>Based on your goal: {answers.goal || "growing your income"}</div>
           </div>
+          {WHATSAPP_NUMBER && (
+            
+              href={whatsappLink(answers.name)}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ ...waBtn, marginBottom: "1rem" }}
+            >
+              <MessageCircle size={15} /> Chat with us on WhatsApp
+            </a>
+          )}
           {saveError && <div style={{ color: C.coral, fontSize: "0.78rem", marginBottom: "0.8rem" }}>{saveError}</div>}
           <div style={{ display: "flex", flexDirection: "column", gap: "0.7rem" }}>
             {MODULES.map((m) => (
@@ -444,3 +474,4 @@ function StepInput({ step, textVal, setTextVal, onSubmit }) {
 const primaryBtn = { background: C.gold, color: "#1B1506", border: "none", borderRadius: "8px", padding: "0.7rem 1.1rem", fontWeight: 700, fontSize: "0.9rem", cursor: "pointer", width: "100%" };
 const chipBtn = { background: C.panel, color: C.text, border: `1px solid ${C.line}`, borderRadius: "20px", padding: "0.5rem 0.9rem", fontSize: "0.85rem", cursor: "pointer" };
 const ghostBtn = { background: "none", border: `1px solid ${C.line}`, color: C.muted, borderRadius: "6px", padding: "0.4rem 0.7rem", fontSize: "0.78rem", cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "0.3rem" };
+const waBtn = { background: "#25D366", color: "#0B1B0F", border: "none", borderRadius: "8px", padding: "0.65rem 1rem", fontSize: "0.85rem", fontWeight: 700, cursor: "pointer", display: "inline-flex", alignItems: "center", gap: "0.4rem", textDecoration: "none", width: "fit-content" };
